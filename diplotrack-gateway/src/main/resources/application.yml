@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: diplotrack-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: service-utilisateur
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/utilisateurs/**,/api/v1/profils/**
+        - id: service-diplome
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/diplomes/**,/api/v1/demandes-verification/**
+        - id: service-offre
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/offres/**,/api/v1/candidatures/**
+        - id: service-competences-recrutement
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/v1/competences/**,/api/v1/besoins-recrutement/**,/api/v1/propositions-profils/**,/api/v1/indicateurs/**
+        - id: service-notification
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/v1/notifications/**
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/diplotrack
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
