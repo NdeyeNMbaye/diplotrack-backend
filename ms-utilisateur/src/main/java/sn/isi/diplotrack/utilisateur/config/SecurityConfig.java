@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/error").permitAll()
-
+                        .requestMatchers(HttpMethod.GET, "/api/v1/utilisateurs/moi").authenticated()
                         // Profils (F03, F09, F14)
                         .requestMatchers(HttpMethod.PUT, "/api/v1/profils/*").hasRole("DIPLOME")
                         .requestMatchers(HttpMethod.GET, "/api/v1/profils/*")

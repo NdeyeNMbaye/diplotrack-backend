@@ -29,6 +29,13 @@ public class UtilisateurService {
         return toDTO(utilisateur);
     }
 
+    public UtilisateurDTO findByKeycloakId(String keycloakId) {
+        Utilisateur utilisateur = utilisateurRepository.findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "Aucun utilisateur DiploTrack lié à ce compte Keycloak"));
+        return toDTO(utilisateur);
+    }
+
     public void updateActif(Long id, Boolean actif) {
         Utilisateur utilisateur = utilisateurRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Utilisateur non trouvé"));
@@ -42,6 +49,7 @@ public class UtilisateurService {
         dto.setNom(u.getNom());
         dto.setPrenom(u.getPrenom());
         dto.setEmail(u.getEmail());
+        dto.setKeycloakId(u.getKeycloakId());
         dto.setActif(u.getActif());
         dto.setDateCreation(u.getDateCreation());
         return dto;
