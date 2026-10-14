@@ -5,6 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
 
+/**
+ * Compétence soumise par un diplômé (F04) et examinée par le COIP (F11).
+ * Elle n'apparaît dans le profil certifié qu'après approbation.
+ */
 @Getter
 @Setter
 @Entity
@@ -34,9 +38,11 @@ public class Competence {
     @Column(nullable = false)
     private String statut = "EN_ATTENTE";
 
-    @Column(name = "profil_id", nullable = false)
-    private Long profilId;
+    /** Sub Keycloak du diplômé qui soumet (référence logique vers Service Utilisateur). */
+    @Column(name = "profil_id", nullable = false, length = 100)
+    private String profilId;
 
-    @Column(name = "agent_coip_id")
-    private Long agentCoipId;
+    /** Sub Keycloak de l'agent COIP qui a décidé, renseigné à l'approbation ou au refus. */
+    @Column(name = "agent_coip_id", length = 100)
+    private String agentCoipId;
 }

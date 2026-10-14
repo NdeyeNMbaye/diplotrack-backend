@@ -17,6 +17,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Droits d'accès du Service Compétences et Recrutement.
+ * Le diplômé soumet ses compétences (F04) ; le COIP les examine (F11), suit les indicateurs (F12)
+ * et traite les besoins des entreprises (F13) ; l'entreprise partenaire dépose ses besoins (F14).
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -31,16 +36,15 @@ public class SecurityConfig {
 
                         // Compétences (F04, F11)
                         .requestMatchers(HttpMethod.POST, "/api/v1/competences").hasRole("DIPLOME")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/competences/mes-competences").hasRole("DIPLOME")
                         .requestMatchers(HttpMethod.GET, "/api/v1/competences/statut/*").hasRole("AGENT_COIP")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/competences/profil/*").hasAnyRole("DIPLOME", "AGENT_COIP")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/competences/*/approuver").hasRole("AGENT_COIP")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/competences/*/refuser").hasRole("AGENT_COIP")
 
-                        // Besoins de recrutement (F13, F14)
+                        // Besoins de recrutement (F14, F13)
                         .requestMatchers(HttpMethod.POST, "/api/v1/besoins-recrutement").hasRole("ENTREPRISE_PARTENAIRE")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/besoins-recrutement/mes-besoins").hasRole("ENTREPRISE_PARTENAIRE")
                         .requestMatchers(HttpMethod.GET, "/api/v1/besoins-recrutement").hasRole("AGENT_COIP")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/besoins-recrutement/entreprise/*")
-                        .hasAnyRole("ENTREPRISE_PARTENAIRE", "AGENT_COIP")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/besoins-recrutement/*/prendre-en-charge").hasRole("AGENT_COIP")
 
                         // Propositions de profils (F13, F14)
@@ -59,6 +63,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /** Keycloak place les rôles dans realm_access.roles ; Spring les attend préfixés par ROLE_. */
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();

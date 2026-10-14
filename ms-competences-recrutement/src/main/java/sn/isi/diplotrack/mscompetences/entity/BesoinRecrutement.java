@@ -5,6 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
 
+/**
+ * Besoin en recrutement déposé par une entreprise partenaire (F14),
+ * pris en charge par un agent COIP qui lui propose des profils (F13).
+ */
 @Getter
 @Setter
 @Entity
@@ -29,9 +33,11 @@ public class BesoinRecrutement {
     @Column(nullable = false)
     private String statut = "EN_ATTENTE";
 
-    @Column(name = "entreprise_partenaire_id", nullable = false)
-    private Long entreprisePartenaireId;
+    /** Sub Keycloak de l'entreprise partenaire demandeuse. */
+    @Column(name = "entreprise_partenaire_id", nullable = false, length = 100)
+    private String entreprisePartenaireId;
 
-    @Column(name = "agent_coip_id")
-    private Long agentCoipId;
+    /** Sub Keycloak de l'agent COIP qui a pris le besoin en charge. */
+    @Column(name = "agent_coip_id", length = 100)
+    private String agentCoipId;
 }

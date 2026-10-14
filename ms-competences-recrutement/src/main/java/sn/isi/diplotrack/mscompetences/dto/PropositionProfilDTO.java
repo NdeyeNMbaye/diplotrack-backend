@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
 
+/** profilId est choisi par l'agent COIP ; agentCoipId est déduit du jeton. */
 @Getter
 @Setter
 public class PropositionProfilDTO {
@@ -11,6 +12,6 @@ public class PropositionProfilDTO {
     private Long besoinRecrutementId;
     private LocalDateTime dateProposition;
     private String statut;
-    private Long profilId;
-    private Long agentCoipId;
+    private String profilId;
+    private String agentCoipId;
 }

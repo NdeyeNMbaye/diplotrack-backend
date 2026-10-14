@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface CompetenceRepository extends JpaRepository<Competence, Long> {
     List<Competence> findByStatut(String statut);
-    List<Competence> findByProfilId(Long profilId);
+    List<Competence> findByProfilId(String profilId);
     long countByStatut(String statut);
 }

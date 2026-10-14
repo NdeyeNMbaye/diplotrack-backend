@@ -5,6 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
 
+/**
+ * Profil de diplômé proposé par le COIP en réponse à un besoin (F13),
+ * consulté ensuite par l'entreprise (F14).
+ */
 @Getter
 @Setter
 @Entity
@@ -25,9 +29,11 @@ public class PropositionProfil {
     @Column(nullable = false)
     private String statut = "PROPOSEE";
 
-    @Column(name = "profil_id", nullable = false)
-    private Long profilId;
+    /** Sub Keycloak du diplômé proposé, choisi par l'agent COIP. */
+    @Column(name = "profil_id", nullable = false, length = 100)
+    private String profilId;
 
-    @Column(name = "agent_coip_id", nullable = false)
-    private Long agentCoipId;
+    /** Sub Keycloak de l'agent COIP qui propose. */
+    @Column(name = "agent_coip_id", nullable = false, length = 100)
+    private String agentCoipId;
 }

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
 
+/** profilId et agentCoipId sont en lecture seule : déduits du jeton, jamais du body. */
 @Getter
 @Setter
 public class CompetenceDTO {
@@ -16,6 +17,6 @@ public class CompetenceDTO {
     private LocalDateTime dateSoumission;
     private LocalDateTime dateApprobation;
     private String statut;
-    private Long profilId;
-    private Long agentCoipId;
+    private String profilId;
+    private String agentCoipId;
 }

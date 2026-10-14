@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
 
+/** entreprisePartenaireId et agentCoipId sont en lecture seule : déduits du jeton. */
 @Getter
 @Setter
 public class BesoinRecrutementDTO {
@@ -13,6 +14,6 @@ public class BesoinRecrutementDTO {
     private String competencesRequises;
     private LocalDateTime dateSoumission;
     private String statut;
-    private Long entreprisePartenaireId;
-    private Long agentCoipId;
+    private String entreprisePartenaireId;
+    private String agentCoipId;
 }
