@@ -4,20 +4,27 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sn.isi.diplotrack.diplome.dto.DemandeVerificationDTO;
 import sn.isi.diplotrack.diplome.entity.DemandeVerification;
-import sn.isi.diplotrack.diplome.entity.Diplome;
 import sn.isi.diplotrack.diplome.repository.DemandeVerificationRepository;
-import sn.isi.diplotrack.diplome.repository.DiplomeRepository;
+
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+/**
+ * Logique métier des demandes de vérification de diplôme (F08, F16).
+ */
 @Service
 @RequiredArgsConstructor
 public class DemandeVerificationService {
 
     private final DemandeVerificationRepository demandeVerificationRepository;
-    private final DiplomeRepository diplomeRepository;
+    private final EmailService emailService;
 
+    /**
+     * Enregistre une nouvelle demande sur la plateforme (statut EN_ATTENTE).
+     * Aucun email n'est envoyé : la demande attend son traitement par la scolarité.
+     */
     public DemandeVerificationDTO save(DemandeVerificationDTO dto) {
         DemandeVerification demande = new DemandeVerification();
         demande.setNomDiplome(dto.getNomDiplome());
@@ -30,6 +37,7 @@ public class DemandeVerificationService {
         return toDTO(demandeVerificationRepository.save(demande));
     }
 
+    /** Liste toutes les demandes (file de traitement de la scolarité). */
     public List<DemandeVerificationDTO> findAll() {
         return demandeVerificationRepository.findAll()
                 .stream()
@@ -37,6 +45,7 @@ public class DemandeVerificationService {
                 .collect(Collectors.toList());
     }
 
+    /** Liste les demandes d'un statut donné (par exemple EN_ATTENTE). */
     public List<DemandeVerificationDTO> findByStatut(String statut) {
         return demandeVerificationRepository.findByStatut(statut)
                 .stream()
@@ -44,15 +53,26 @@ public class DemandeVerificationService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Traite une demande : enregistre le résultat puis envoie la réponse par email au demandeur.
+     *
+     * @throws NoSuchElementException si la demande n'existe pas (renvoyé en 404)
+     */
     public DemandeVerificationDTO traiter(Long id, String resultat) {
         DemandeVerification demande = demandeVerificationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Demande non trouvée"));
+                .orElseThrow(() -> new NoSuchElementException("Demande non trouvée"));
+
         demande.setResultat(resultat);
         demande.setStatut("TRAITE");
         demande.setDateTraitement(LocalDateTime.now());
-        return toDTO(demandeVerificationRepository.save(demande));
+        DemandeVerification traitee = demandeVerificationRepository.save(demande);
+
+        // Seul déclencheur d'email du processus
+        emailService.envoyerReponse(traitee);
+        return toDTO(traitee);
     }
 
+    /** Convertit l'entité en DTO pour la réponse de l'API. */
     private DemandeVerificationDTO toDTO(DemandeVerification d) {
         DemandeVerificationDTO dto = new DemandeVerificationDTO();
         dto.setId(d.getId());
