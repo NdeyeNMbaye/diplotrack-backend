@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+/** Consultation des comptes et activation ou désactivation par l'administrateur (F17). */
 @Service
 @RequiredArgsConstructor
 public class UtilisateurService {
@@ -29,6 +30,7 @@ public class UtilisateurService {
         return toDTO(utilisateur);
     }
 
+    /** Retrouve la fiche de l'utilisateur connecté à partir du sub de son jeton. */
     public UtilisateurDTO findByKeycloakId(String keycloakId) {
         Utilisateur utilisateur = utilisateurRepository.findByKeycloakId(keycloakId)
                 .orElseThrow(() -> new NoSuchElementException(

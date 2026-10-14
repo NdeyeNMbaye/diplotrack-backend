@@ -26,6 +26,15 @@ spring:
         jwt:
           issuer-uri: http://localhost:8180/realms/diplotrack
 
+# Compte technique du service pour ouvrir les comptes dans Keycloak (F17).
+# Le secret ne figure jamais dans le dépôt : il est lu depuis l'environnement.
+keycloak:
+  admin:
+    base-url: http://localhost:8180
+    realm: diplotrack
+    client-id: diplotrack-admin-service
+    client-secret: ${KEYCLOAK_ADMIN_SECRET:}
+
 management:
   endpoints:
     web:

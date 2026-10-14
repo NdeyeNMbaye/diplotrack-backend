@@ -17,6 +17,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Droits d'accès du Service Utilisateur.
+ * L'administrateur ouvre et active les comptes (F17) ; le diplômé complète son profil (F03) ;
+ * le COIP et les entreprises partenaires consultent les profils (F09, F14).
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -28,13 +33,17 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/error").permitAll()
+
+                        // Chaque utilisateur connecté peut lire sa propre fiche
                         .requestMatchers(HttpMethod.GET, "/api/v1/utilisateurs/moi").authenticated()
+
                         // Profils (F03, F09, F14)
                         .requestMatchers(HttpMethod.PUT, "/api/v1/profils/*").hasRole("DIPLOME")
                         .requestMatchers(HttpMethod.GET, "/api/v1/profils/*")
                         .hasAnyRole("DIPLOME", "AGENT_COIP", "ENTREPRISE_PARTENAIRE")
 
                         // Comptes utilisateurs (F17)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/utilisateurs").hasRole("ADMINISTRATEUR")
                         .requestMatchers(HttpMethod.GET, "/api/v1/utilisateurs").hasRole("ADMINISTRATEUR")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/utilisateurs/*/actif").hasRole("ADMINISTRATEUR")
                         .requestMatchers(HttpMethod.GET, "/api/v1/utilisateurs/*")
@@ -48,6 +57,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /** Keycloak place les rôles dans realm_access.roles ; Spring les attend préfixés par ROLE_. */
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
