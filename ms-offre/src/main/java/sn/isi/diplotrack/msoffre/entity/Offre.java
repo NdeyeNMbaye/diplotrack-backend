@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
+/**
+ * Offre de stage ou d'emploi publiée par le COIP (F10), consultée par les diplômés (F05).
+ */
 @Data
 @Entity
 @Table(name = "offre")
@@ -32,6 +35,7 @@ public class Offre {
     @Column(nullable = false)
     private String statut = "ACTIVE";
 
-    @Column(name = "agent_coip_id", nullable = false)
-    private Long agentCoipId;
+    /** Identifiant Keycloak (sub) de l'agent COIP auteur : référence logique vers Service Utilisateur. */
+    @Column(name = "agent_coip_id", nullable = false, length = 100)
+    private String agentCoipId;
 }

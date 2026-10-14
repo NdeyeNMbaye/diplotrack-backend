@@ -2,9 +2,7 @@ package sn.isi.diplotrack.msoffre.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -19,6 +17,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Droits d'accès du Service Offre.
+ * Le COIP publie les offres et suit les candidatures (F10) ; le diplômé consulte
+ * les offres (F05), postule et suit ses candidatures (F06).
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -30,10 +33,17 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/error").permitAll()
+
+                        // Offres (F10, F05)
                         .requestMatchers(HttpMethod.POST, "/api/v1/offres").hasRole("AGENT_COIP")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/offres/*/statut").hasRole("AGENT_COIP")
                         .requestMatchers(HttpMethod.GET, "/api/v1/offres/**").hasAnyRole("DIPLOME", "AGENT_COIP")
-                        .requestMatchers("/api/v1/candidatures/**").hasRole("DIPLOME")
+
+                        // Candidatures (F06) : le COIP décide, le diplômé postule et suit les siennes
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/candidatures/*/statut").hasRole("AGENT_COIP")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/candidatures").hasRole("DIPLOME")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/candidatures/mes-candidatures").hasRole("DIPLOME")
+
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -42,6 +52,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /** Keycloak place les rôles dans realm_access.roles ; Spring les attend préfixés par ROLE_. */
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();

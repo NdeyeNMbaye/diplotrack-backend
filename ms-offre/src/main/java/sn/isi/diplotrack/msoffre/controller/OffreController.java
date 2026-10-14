@@ -2,11 +2,18 @@ package sn.isi.diplotrack.msoffre.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import sn.isi.diplotrack.msoffre.dto.OffreDTO;
 import sn.isi.diplotrack.msoffre.service.OffreService;
+
 import java.util.List;
 
+/**
+ * Offres de stage et d'emploi. Publication et clôture réservées au COIP (F10) ;
+ * consultation ouverte aux diplômés et au COIP (F05).
+ */
 @RestController
 @RequestMapping("/api/v1/offres")
 @RequiredArgsConstructor
@@ -15,8 +22,8 @@ public class OffreController {
     private final OffreService offreService;
 
     @PostMapping
-    public ResponseEntity<OffreDTO> save(@RequestBody OffreDTO dto) {
-        return ResponseEntity.ok(offreService.save(dto));
+    public ResponseEntity<OffreDTO> save(@RequestBody OffreDTO dto, @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(offreService.save(dto, jwt.getSubject()));
     }
 
     @GetMapping
@@ -35,9 +42,7 @@ public class OffreController {
     }
 
     @PatchMapping("/{id}/statut")
-    public ResponseEntity<OffreDTO> updateStatut(
-            @PathVariable Long id,
-            @RequestParam String statut) {
+    public ResponseEntity<OffreDTO> updateStatut(@PathVariable Long id, @RequestParam String statut) {
         return ResponseEntity.ok(offreService.updateStatut(id, statut));
     }
 }

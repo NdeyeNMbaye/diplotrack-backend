@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
+/**
+ * Candidature d'un diplômé à une offre (F06). Le suivi de son état est assuré par le COIP.
+ */
 @Data
 @Entity
 @Table(name = "candidature")
@@ -23,6 +26,7 @@ public class Candidature {
     @Column(nullable = false)
     private String statut = "EN_ATTENTE";
 
-    @Column(name = "diplome_utilisateur_id", nullable = false)
-    private Long diplomeUtilisateurId;
+    /** Identifiant Keycloak (sub) du diplômé candidat : référence logique vers Service Utilisateur. */
+    @Column(name = "diplome_utilisateur_id", nullable = false, length = 100)
+    private String diplomeUtilisateurId;
 }
